@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 
 import java.util.List;
@@ -70,7 +69,7 @@ public class CompanyDAO extends DataCRUD<Company> {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         Query query = session.createQuery(" FROM Company as c WHERE c.name =  :name ");
-        Company result=null;
+        Company result = null;
         try {
             result = (Company) query.setParameter("name", name).uniqueResult();
             transaction.commit();

@@ -4,7 +4,6 @@ import com.project.management.database.HibernateDataBaseConnector;
 import com.project.management.services.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Hibernate;
 
 
 import static com.project.management.services.InputValidator.*;
@@ -28,28 +27,6 @@ public class Controller {
                 "or exit for exit");
         choseOfMainFunction(view.read());
     }
-
-  /*  public void choseOfMainFunction(String input) {
-        switch (input) {
-            case "CRUD": {
-                tableCrudAsk(view);
-                choseCrudOption(validateString(view));
-                askMainOption();
-                break;
-            }
-
-            case "exit": {
-                view.write("Goodbye!");
-                System.exit(0);
-                break;
-            }
-            default: {
-                view.write("Command  was incorrect \n" +
-                        "try one more time to chose MAIN command");
-                askMainOption();
-            }
-        }
-    }*/
 
     public void choseOfMainFunction(String input) {
         switch (input) {
@@ -92,7 +69,6 @@ public class Controller {
             }
         }
     }
-
 
 
     public void optionCreateObjectMenu(String input) {
@@ -216,26 +192,26 @@ public class Controller {
         switch (input) {
             case "customer": {
                 CustomerService customerService = new CustomerService(view);
-                    customerService.readCustomer();
+                customerService.readCustomer();
                 askMainOption();
                 break;
             }
             case "company": {
                 CompanyService companyService = new CompanyService(view);
-               companyService.readCompany();
+                companyService.readCompany();
                 askMainOption();
                 break;
 
             }
             case "project": {
                 ProjectService projectService = new ProjectService(view);
-                    projectService.readProject();
+                projectService.readProject();
                 askMainOption();
                 break;
             }
             case "developer": {
                 DeveloperService developerService = new DeveloperService(view);
-                    developerService.readDeveloper();
+                developerService.readDeveloper();
                 askMainOption();
                 break;
             }

@@ -2,15 +2,12 @@ package com.project.management.domainDAO;
 
 
 import com.project.management.database.HibernateDataBaseConnector;
-import com.project.management.domain.Company;
-import com.project.management.domain.Customer;
 import com.project.management.domain.Developer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 
 import java.util.List;
@@ -20,6 +17,7 @@ public class DeveloperDAO extends DataCRUD<Developer> {
 
     private static final Logger LOGGER = LogManager.getLogger(DeveloperDAO.class);
     private SessionFactory sessionFactory;
+
     public DeveloperDAO() {
         sessionFactory = HibernateDataBaseConnector.getSessionFactory();
     }
@@ -38,7 +36,7 @@ public class DeveloperDAO extends DataCRUD<Developer> {
     public List<Developer> read() {
         Session session = sessionFactory.openSession();
         LOGGER.debug(" Print list of developers  ");
-        return ( session.createQuery(" FROM Developer ").getResultList());
+        return (session.createQuery(" FROM Developer ").getResultList());
     }
 
     @Override
@@ -48,7 +46,7 @@ public class DeveloperDAO extends DataCRUD<Developer> {
         session.update(developer);
         transaction.commit();
         session.close();
-        LOGGER.debug("Developer  " +developer.getName() + "  was updated");
+        LOGGER.debug("Developer  " + developer.getName() + "  was updated");
         System.out.println("Customer  " + developer.toString() + "  was updated");
     }
 
@@ -59,7 +57,7 @@ public class DeveloperDAO extends DataCRUD<Developer> {
         session.delete(developer);
         transaction.commit();
         session.close();
-        LOGGER.debug("Developer  " +developer.getName() + "  was deleted");
+        LOGGER.debug("Developer  " + developer.getName() + "  was deleted");
         System.out.println("developer  " + developer.toString() + "  was deleted");
     }
 

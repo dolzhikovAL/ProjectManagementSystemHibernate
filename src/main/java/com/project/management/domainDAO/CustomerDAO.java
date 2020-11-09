@@ -1,14 +1,12 @@
 package com.project.management.domainDAO;
 
 import com.project.management.database.HibernateDataBaseConnector;
-import com.project.management.domain.Company;
 import com.project.management.domain.Customer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 
 import java.util.List;
@@ -16,11 +14,12 @@ import java.util.List;
 public class CustomerDAO extends DataCRUD<Customer> {
 
     private SessionFactory sessionFactory;
+
     public CustomerDAO() {
         sessionFactory = HibernateDataBaseConnector.getSessionFactory();
     }
-    private static final Logger LOGGER = LogManager.getLogger(CustomerDAO.class);
 
+    private static final Logger LOGGER = LogManager.getLogger(CustomerDAO.class);
 
 
     @Override
@@ -37,11 +36,10 @@ public class CustomerDAO extends DataCRUD<Customer> {
     }
 
 
-
     public List<Customer> read() {
         Session session = sessionFactory.openSession();
         LOGGER.debug(" Print list of customers  ");
-        return ( session.createQuery(" FROM Customer ").getResultList());
+        return (session.createQuery(" FROM Customer ").getResultList());
     }
 
     @Override
@@ -51,7 +49,7 @@ public class CustomerDAO extends DataCRUD<Customer> {
         session.update(customer);
         transaction.commit();
         session.close();
-        LOGGER.debug("Customer  " +customer.getName() + "  was updated");
+        LOGGER.debug("Customer  " + customer.getName() + "  was updated");
         System.out.println("Customer  " + customer.toString() + "  was updated");
     }
 
@@ -62,7 +60,7 @@ public class CustomerDAO extends DataCRUD<Customer> {
         session.delete(customer);
         transaction.commit();
         session.close();
-        LOGGER.debug("Customer  " +customer.getName() + "  was deleted");
+        LOGGER.debug("Customer  " + customer.getName() + "  was deleted");
         System.out.println("Customer  " + customer.toString() + "  was deleted");
     }
 

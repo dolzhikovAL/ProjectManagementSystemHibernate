@@ -1,15 +1,12 @@
 package com.project.management.domainDAO;
 
 import com.project.management.database.HibernateDataBaseConnector;
-import com.project.management.domain.Company;
-import com.project.management.domain.Developer;
 import com.project.management.domain.Project;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 
 import java.util.List;
@@ -18,6 +15,7 @@ public class ProjectDAO extends DataCRUD<Project> {
 
     private static final Logger LOGGER = LogManager.getLogger(ProjectDAO.class);
     private SessionFactory sessionFactory;
+
     public ProjectDAO() {
         sessionFactory = HibernateDataBaseConnector.getSessionFactory();
     }
@@ -30,14 +28,14 @@ public class ProjectDAO extends DataCRUD<Project> {
         session.save(project);
         transaction.commit();
         session.close();
-        LOGGER.debug("project  " +project.getName() + "  was created");
+        LOGGER.debug("project  " + project.getName() + "  was created");
         System.out.println("project " + project.toString() + "  was created");
     }
 
     public List<Project> read() {
         Session session = sessionFactory.openSession();
         LOGGER.debug(" Print list of projects  ");
-        return ( session.createQuery(" FROM Project  ").getResultList());
+        return (session.createQuery(" FROM Project  ").getResultList());
     }
 
     @Override
@@ -47,7 +45,7 @@ public class ProjectDAO extends DataCRUD<Project> {
         session.update(project);
         transaction.commit();
         session.close();
-        LOGGER.debug("project  " +project.getName() + "  was updated");
+        LOGGER.debug("project  " + project.getName() + "  was updated");
         System.out.println("project " + project.toString() + "  was updated");
     }
 
@@ -58,7 +56,7 @@ public class ProjectDAO extends DataCRUD<Project> {
         session.delete(project);
         transaction.commit();
         session.close();
-        LOGGER.debug("project  " +project.getName() + "  was deleted");
+        LOGGER.debug("project  " + project.getName() + "  was deleted");
         System.out.println("project " + project.toString() + "  was deleted");
     }
 

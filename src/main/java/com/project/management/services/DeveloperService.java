@@ -1,7 +1,6 @@
 package com.project.management.services;
 
 import com.project.management.console.View;
-import com.project.management.domain.Customer;
 import com.project.management.domain.Developer;
 import com.project.management.domainDAO.DeveloperDAO;
 
@@ -13,7 +12,7 @@ import static com.project.management.services.InputValidator.validateString;
 public class DeveloperService {
 
     private final View view;
-    private  DeveloperDAO developerDAO;
+    private DeveloperDAO developerDAO;
 
     public DeveloperService(View view) {
         developerDAO = new DeveloperDAO();
@@ -22,11 +21,12 @@ public class DeveloperService {
 
 
     public void createDeveloper() {
-       Developer developer = enterPositionDeveloper();
+        Developer developer = enterPositionDeveloper();
         developerDAO.create(developer);
     }
-    public void readDeveloper()  {
-        List<Developer> list= developerDAO.read();
+
+    public void readDeveloper() {
+        List<Developer> list = developerDAO.read();
         System.out.println(list.toString());
     }
 
@@ -39,8 +39,9 @@ public class DeveloperService {
         String sex = validateString(view);
         view.write("Enter Developer age only numbers available");
         int age = inputInteger(view);
-        return (new Developer(name, salary,sex,age));
+        return (new Developer(name, salary, sex, age));
     }
+
     public void deleteDeveloper() {
         view.write("Enter Developer  name");
         String name = validateString(view);
@@ -53,7 +54,7 @@ public class DeveloperService {
     }
 
     public void updateDeveloper() {
-       Developer developer = enterPositionDeveloper();
+        Developer developer = enterPositionDeveloper();
         developer = developerDAO.findByName(developer.getName());
         if (developer != null) {
             developerDAO.update(developer);

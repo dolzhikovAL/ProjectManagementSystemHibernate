@@ -1,10 +1,9 @@
 package com.project.management.services;
 
 import com.project.management.console.View;
-import com.project.management.domain.Developer;
 import com.project.management.domain.Project;
-import com.project.management.domainDAO.DataCRUD;
 import com.project.management.domainDAO.ProjectDAO;
+
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
@@ -24,11 +23,11 @@ public class ProjectService {
 
     public void createProject() {
         Project project = enterPositionProject();
-       projectDAO.create(project);
+        projectDAO.create(project);
     }
 
-    public void readProject()  {
-        List<Project> list= projectDAO.read();
+    public void readProject() {
+        List<Project> list = projectDAO.read();
         System.out.println(list.toString());
     }
 
@@ -41,7 +40,7 @@ public class ProjectService {
     }
 
     public void updateProject() {
-       Project project =enterPositionProject();
+        Project project = enterPositionProject();
         project = projectDAO.findByName(project.getName());
         if (project != null) {
             projectDAO.update(project);
@@ -53,7 +52,7 @@ public class ProjectService {
     public void deleteProject() {
         view.write("Enter project  name");
         String name = validateString(view);
-       Project project = projectDAO.findByName(name);
+        Project project = projectDAO.findByName(name);
         if (project != null) {
             projectDAO.delete(project);
         } else {

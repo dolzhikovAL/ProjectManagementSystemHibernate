@@ -36,8 +36,9 @@ public class Developer {
         this.age = age;
         this.salary = salary;
     }
-    public Developer(){}
 
+    public Developer() {
+    }
 
 
     @Override
