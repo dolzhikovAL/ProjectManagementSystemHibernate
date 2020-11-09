@@ -13,4 +13,4 @@ public class Console implements View {
     public void write(String message) {
         System.out.println(message);
     }
-}
+} 

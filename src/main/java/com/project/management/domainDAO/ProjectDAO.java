@@ -1,74 +1,81 @@
 package com.project.management.domainDAO;
 
-import com.project.management.database.DataBaseConnector;
+import com.project.management.database.HibernateDataBaseConnector;
+import com.project.management.domain.Company;
+import com.project.management.domain.Developer;
 import com.project.management.domain.Project;
-import com.zaxxer.hikari.HikariDataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.List;
 
 public class ProjectDAO extends DataCRUD<Project> {
 
-    private final HikariDataSource connector = DataBaseConnector.getConnector();
     private static final Logger LOGGER = LogManager.getLogger(ProjectDAO.class);
-    private final static String READ = "SELECT * FROM projects;";
-    private final static String INSERT = "INSERT INTO projects  (name,dead_line)  VALUES (?,?)";
-    private final static String UPDATE = "UPDATE projects set email=? where name=?;";
-    private final static String DELETE = "DELETE FROM projects WHERE name=? ";
+    private SessionFactory sessionFactory;
+    public ProjectDAO() {
+        sessionFactory = HibernateDataBaseConnector.getSessionFactory();
+    }
 
 
     @Override
     public void create(Project project) {
-        try (Connection connection = connector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(INSERT)) {
-            LOGGER.debug("Create project : project.name%s " + project.getName());
-            statement.setString(1, project.getName());
-            statement.setDate(2, Date.valueOf(project.getDeadLine()));
-            statement.execute();
-            System.out.println("Project   " + project.toString() + "  was created");
-        } catch (SQLException e) {
-            LOGGER.error(" FAIL to Create project : project.name%s " + project.getName());
-
-            System.out.println("Fail when create Project  " + e.getMessage());
-        }
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.save(project);
+        transaction.commit();
+        session.close();
+        LOGGER.debug("project  " +project.getName() + "  was created");
+        System.out.println("project " + project.toString() + "  was created");
     }
 
-    @Override
-    public void read() {
-        OutPutValidator.writeOUT(READ);
+    public List<Project> read() {
+        Session session = sessionFactory.openSession();
+        LOGGER.debug(" Print list of projects  ");
+        return ( session.createQuery(" FROM Project  ").getResultList());
     }
 
     @Override
     public void update(Project project) {
-        try (Connection connection = connector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(UPDATE)) {
-            LOGGER.debug("Create project : project.name%s " + project.getName());
-            statement.setDate(1, Date.valueOf(project.getDeadLine()));
-            statement.setString(2, project.getName());
-            statement.execute();
-            System.out.println("Project  " + project.toString() + "  was updated");
-        } catch (SQLException e) {
-            LOGGER.error(" FAIL to Update project : project.name%s " + project.getName());
-            System.out.println("Fail when Update Project  " + e.getMessage());
-        }
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.update(project);
+        transaction.commit();
+        session.close();
+        LOGGER.debug("project  " +project.getName() + "  was updated");
+        System.out.println("project " + project.toString() + "  was updated");
     }
 
     @Override
-    public void delete(String name) {
-        try (Connection connection = connector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE)) {
-            LOGGER.debug("delete project: project.name%s " + name);
-            statement.setString(1, name);
-            statement.execute();
-            System.out.println("Project  " + name + "  was deleted");
-        } catch (SQLException e) {
-            LOGGER.error(" FAIL to delete project : project.name%s " + name);
-            System.out.println("Fail to delete project " + e.getMessage());
+    public void delete(Project project) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.delete(project);
+        transaction.commit();
+        session.close();
+        LOGGER.debug("project  " +project.getName() + "  was deleted");
+        System.out.println("project " + project.toString() + "  was deleted");
+    }
+
+    public Project findByName(String name) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery(" FROM Project as p WHERE p.name =  :name ");
+        Project result;
+        try {
+            result = (Project) query.setParameter("name", name).uniqueResult();
+            transaction.commit();
+        } catch (Exception e) {
+            throw new NullPointerException("Company with that name noy found in database");
         }
+        session.close();
+        LOGGER.debug("Company  " + result.getName() + "  was found");
+        return result;
     }
 }
 

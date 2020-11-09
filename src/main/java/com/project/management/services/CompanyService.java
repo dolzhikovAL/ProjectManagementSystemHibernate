@@ -6,6 +6,7 @@ import com.project.management.domainDAO.CompanyDAO;
 import com.project.management.domainDAO.DataCRUD;
 
 import java.sql.SQLException;
+import java.util.List;
 
 
 import static com.project.management.services.InputValidator.validateString;
@@ -13,26 +14,21 @@ import static com.project.management.services.InputValidator.validateString;
 public class CompanyService {
 
     private final View view;
-    private DataCRUD<Company> CompanyDAO;
+    private CompanyDAO companyDAO;
 
     public CompanyService(View view) {
-        CompanyDAO = new CompanyDAO();
+        companyDAO = new CompanyDAO();
         this.view = view;
     }
 
-    public void inputCompany() {
+    public void createCompany() {
         Company company = enterPositionCompany();
-        try {
-            CompanyDAO.create(company);
-        } catch (SQLException e) {
-            view.write("Can't create  company with name -- " + company.getName() + "  " + e.getMessage());
-        }
+        companyDAO.create(company);
     }
 
-    public void readCompany() throws SQLException {
-        view.write("Out Companies in format NAME \n" +
-                "Country");
-        CompanyDAO.read();
+    public void readCompany() {
+        List<Company> list= companyDAO.read();
+        System.out.println(list.toString());
     }
 
     public Company enterPositionCompany() {
@@ -45,22 +41,22 @@ public class CompanyService {
 
     public void updateCompany() {
         Company company = enterPositionCompany();
-        try {
-            CompanyDAO.update(company);
-        } catch (SQLException e) {
-            view.write("Can't update  company with name -- " + company.getName() + "  " + e.getMessage());
+        company = companyDAO.findByName(company.getName());
+        if (company == null) {
+            view.write("Company with   not found");
+        } else {
+            companyDAO.update(company);
         }
     }
 
-    public void deleteCompany() {
-        view.write("Enter Company name");
-        String name = validateString(view);
-        try {
-            CompanyDAO.delete(name);
-        } catch (SQLException e) {
-            view.write("Can't delete  company with name -- " + name + "  " + e.getMessage());
+        public void deleteCompany () {
+            view.write("Enter Company name");
+            String name = validateString(view);
+            Company company = companyDAO.findByName(name);
+            if (company == null) {
+                view.write("Company with " + name + " not found");
+            } else {
+                companyDAO.delete(company);
+            }
         }
     }
-
-
-}

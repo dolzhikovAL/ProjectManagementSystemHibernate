@@ -1,71 +1,83 @@
 package com.project.management.domainDAO;
 
-import com.project.management.database.DataBaseConnector;
+import com.project.management.database.HibernateDataBaseConnector;
 import com.project.management.domain.Company;
-import com.zaxxer.hikari.HikariDataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.List;
 
 
 public class CompanyDAO extends DataCRUD<Company> {
 
-    private final HikariDataSource connector = DataBaseConnector.getConnector();
-    private static final Logger LOGGER = LogManager.getLogger(CompanyDAO.class);
-    private final static String INSERT = "INSERT INTO companies(name,country)VALUES (?,?);";
-    private final static String READ = "SELECT  * FROM companies;";
-    private final static String UPDATE = "UPDATE companies set country=? WHERE name=?;";
-    private final static String DELETE = "DELETE FROM companies WHERE name=? ";
+    private SessionFactory sessionFactory;
+
+    public CompanyDAO() {
+
+        sessionFactory = HibernateDataBaseConnector.getSessionFactory();
+    }
+
+    private static final Logger LOGGER = LogManager.getLogger(Company.class);
+
 
     @Override
     public void create(Company company) {
-        try (Connection connection = connector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(INSERT)) {
-            LOGGER.debug("Create company : company.name%s " + company.getName());
-            statement.setString(1, company.getName());
-            statement.setString(2, company.getCountry());
-            statement.execute();
-            System.out.println("Company  " + company.toString() + "  was created");
-        } catch (SQLException e) {
-            LOGGER.error(" FAIL to Create company : company.name%s " + company.getName());
-            System.out.println("Fail to create company " + e.getMessage());
-        }
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.save(company);
+        transaction.commit();
+        session.close();
+        LOGGER.debug("Company  " + company.getName() + "  was created");
+        System.out.println("Company  " + company.toString() + "  was created");
     }
 
-    @Override
-    public void read() {
-        OutPutValidator.writeOUT(READ);
+
+    public List<Company> read() {
+        Session session = sessionFactory.openSession();
+        LOGGER.debug(" Print list of companies  ");
+        return (session.createQuery(" FROM Company ").getResultList());
     }
 
     @Override
     public void update(Company company) {
-        try (Connection connection = connector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(UPDATE)) {
-            LOGGER.debug("Update company : company.name%s " + company.getName());
-            statement.setString(1, company.getCountry());
-            statement.setString(2, company.getName());
-            statement.execute();
-            System.out.println("Company  " + company.toString() + "  was updated");
-        } catch (SQLException e) {
-            LOGGER.error(" FAIL to update company : company.name%s " + company.getName());
-            System.out.println("Fail to update company " + e.getMessage());
-        }
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.update(company);
+        transaction.commit();
+        session.close();
+        LOGGER.debug("Company  " + company.getName() + "  was updated");
+        System.out.println("Company  " + company.toString() + "  was updated");
     }
 
     @Override
-    public void delete(String name) {
-        try (Connection connection = connector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE)) {
-            LOGGER.debug("Delete company : company.name%s " + name);
-            statement.setString(1, name);
-            statement.execute();
-            System.out.println("Company  " + name + "  was deleted");
-        } catch (SQLException e) {
-            LOGGER.error(" FAIL to delete company : company.name%s " + name);
-            System.out.println("Fail to delete company " + e.getMessage());
+    public void delete(Company company) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.delete(company);
+        transaction.commit();
+        session.close();
+        LOGGER.debug("Company  " + company.getName() + "  was deleted");
+        System.out.println("Company  " + company.toString() + "  was deleted");
+    }
+
+
+    public Company findByName(String name) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery(" FROM Company as c WHERE c.name =  :name ");
+        Company result=null;
+        try {
+            result = (Company) query.setParameter("name", name).uniqueResult();
+            transaction.commit();
+        } catch (Exception e) {
+            throw new NullPointerException("Company with that name noy found in database");
         }
+        session.close();
+        return result;
     }
 }

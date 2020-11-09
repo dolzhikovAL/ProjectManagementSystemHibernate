@@ -1,21 +1,51 @@
 package com.project.management.domain;
 
+import javax.persistence.*;
+import java.util.List;
+
+@Table(name = "developers")
+@Entity
 public class Developer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "developer_id")
+    private Integer id;
+
+    @Column()
+    private String name;
+    @Column()
+    private int salary;
+    @Column()
+    private String sex;
+    @Column()
+    private int age;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "developers_projects",
+            joinColumns = @JoinColumn(name = "developer_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_id")
+    )
+    private List<Project> projects;
+
     public Developer(String name, int salary, String sex, int age) {
         this.name = name;
         this.sex = sex;
         this.age = age;
         this.salary = salary;
     }
+    public Developer(){}
 
-    private String name;
-    private String sex;
-    private int age;
-    private int salary;
+
 
     @Override
     public String toString() {
-        return "Customer name --" + name + "  salary-- " + salary + "  age -- " + age + "  sex --" + sex;
+        return "Customer name --" + name +
+                "  salary-- " + salary +
+                "  age -- " + age +
+                "  sex --" + sex;
     }
 
     public String getName() {

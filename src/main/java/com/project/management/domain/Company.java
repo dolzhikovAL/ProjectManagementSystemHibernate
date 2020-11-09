@@ -1,8 +1,34 @@
 package com.project.management.domain;
 
+import javax.persistence.*;
+import java.util.List;
+
+@Table(name = "companies")
+@Entity
+
 public class Company {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "company_id")
+    private int id;
+
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "country")
     private String country;
+
+    @ManyToMany
+    @JoinTable(
+            name = "companies_projects",
+            joinColumns = @JoinColumn(name = "company_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_id")
+    )
+    private List<Project> projects;
+
+    public Company() {
+    }
 
     public Company(String name, String country) {
         this.name = name;
@@ -11,7 +37,8 @@ public class Company {
 
     @Override
     public String toString() {
-        return "Customer name --" + name + " country -- " + country;
+        return "Company name --" + name +
+                " country -- " + country;
     }
 
     public String getName() {

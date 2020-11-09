@@ -1,78 +1,82 @@
 package com.project.management.domainDAO;
 
-import com.project.management.database.DataBaseConnector;
 
+import com.project.management.database.HibernateDataBaseConnector;
+import com.project.management.domain.Company;
+import com.project.management.domain.Customer;
 import com.project.management.domain.Developer;
-import com.zaxxer.hikari.HikariDataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.List;
 
 
 public class DeveloperDAO extends DataCRUD<Developer> {
 
-    private final HikariDataSource connector = DataBaseConnector.getConnector();
     private static final Logger LOGGER = LogManager.getLogger(DeveloperDAO.class);
-    private final static String READ = "SELECT  * FROM developers;";
-    private final static String INSERT = "INSERT INTO developers(name,salary, sex,age)VALUES (?,?,?,?);";
-    private final static String UPDATE = "UPDATE developers set salary=?,sex=?,age=?  WHERE name=?;";
-    private final static String DELETE = "DELETE FROM developers WHERE name=? ";
-
-    @Override
-    public void create(Developer developer) {
-        try (Connection connection = connector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(INSERT)) {
-            LOGGER.debug("Create developer : developer.name%s " + developer.getName());
-            statement.setString(1, developer.getName());
-            statement.setInt(2, developer.getSalary());
-            statement.setString(3, developer.getSex());
-            statement.setInt(4, developer.getAge());
-            statement.execute();
-            System.out.println("Developer  " + developer.toString() + "  was created");
-        } catch (SQLException e) {
-            LOGGER.error(" FAIL to Create developer : developer.name%s " + developer.getName());
-            System.out.println("Fail when create Developer " + e.getMessage());
-        }
+    private SessionFactory sessionFactory;
+    public DeveloperDAO() {
+        sessionFactory = HibernateDataBaseConnector.getSessionFactory();
     }
 
     @Override
-    public void read() {
-        OutPutValidator.writeOUT(READ);
-        ;
+    public void create(Developer developer) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.save(developer);
+        transaction.commit();
+        session.close();
+        LOGGER.debug("developer  " + developer.getName() + "  was created");
+        System.out.println("developer  " + developer.toString() + "  was created");
+    }
+
+    public List<Developer> read() {
+        Session session = sessionFactory.openSession();
+        LOGGER.debug(" Print list of developers  ");
+        return ( session.createQuery(" FROM Developer ").getResultList());
     }
 
     @Override
     public void update(Developer developer) {
-        try (Connection connection = connector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(UPDATE)) {
-            LOGGER.debug("Update developer : developer.name%s " + developer.getName());
-            statement.setString(4, developer.getName());
-            statement.setInt(1, developer.getSalary());
-            statement.setString(2, developer.getSex());
-            statement.setInt(3, developer.getAge());
-            statement.execute();
-            System.out.println("Developer  " + developer.toString() + "  was updated");
-        } catch (SQLException e) {
-            LOGGER.error(" FAIL to Update developer : developer.name%s " + developer.getName());
-            System.out.println("Fail to update Developer " + e.getMessage());
-        }
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.update(developer);
+        transaction.commit();
+        session.close();
+        LOGGER.debug("Developer  " +developer.getName() + "  was updated");
+        System.out.println("Customer  " + developer.toString() + "  was updated");
     }
 
     @Override
-    public void delete(String name) {
-        try (Connection connection = connector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE)) {
-            LOGGER.debug("delete developer : developer.name%s " + name);
-            statement.setString(1, name);
-            statement.execute();
-            System.out.println("Developer  " + name + "  was deleted");
-        } catch (SQLException e) {
-            LOGGER.error(" FAIL to delete developer : customer.name%s " + name);
-            System.out.println("Fail to delete developer " + e.getMessage());
+    public void delete(Developer developer) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.delete(developer);
+        transaction.commit();
+        session.close();
+        LOGGER.debug("Developer  " +developer.getName() + "  was deleted");
+        System.out.println("developer  " + developer.toString() + "  was deleted");
+    }
+
+    public Developer findByName(String name) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery(" FROM Developer as d WHERE d.name =  :name ");
+        Developer result;
+        try {
+            result = (Developer) query.setParameter("name", name).uniqueResult();
+            transaction.commit();
+        } catch (Exception e) {
+            throw new NullPointerException("Developer with that name noy found in database");
         }
+        session.close();
+        LOGGER.debug("Developer  " + result.getName() + "  was found");
+        return result;
     }
 }
 

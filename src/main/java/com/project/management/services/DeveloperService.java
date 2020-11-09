@@ -1,11 +1,11 @@
 package com.project.management.services;
 
 import com.project.management.console.View;
+import com.project.management.domain.Customer;
 import com.project.management.domain.Developer;
-import com.project.management.domainDAO.DataCRUD;
 import com.project.management.domainDAO.DeveloperDAO;
 
-import java.sql.SQLException;
+import java.util.List;
 
 import static com.project.management.services.InputValidator.inputInteger;
 import static com.project.management.services.InputValidator.validateString;
@@ -13,28 +13,21 @@ import static com.project.management.services.InputValidator.validateString;
 public class DeveloperService {
 
     private final View view;
-    private final DataCRUD<Developer> DeveloperDAO;
+    private  DeveloperDAO developerDAO;
 
     public DeveloperService(View view) {
-        DeveloperDAO = new DeveloperDAO();
+        developerDAO = new DeveloperDAO();
         this.view = view;
     }
 
 
-    public void inputDeveloper() {
-              Developer developer = enterPositionDeveloper();
-        try {
-            DeveloperDAO.create(developer);
-        } catch (SQLException e) {
-            view.write("Can't create  developer with name -- " +developer.getName() + "  " + e.getMessage());
-        }
+    public void createDeveloper() {
+       Developer developer = enterPositionDeveloper();
+        developerDAO.create(developer);
     }
-    public void readDeveloper() throws SQLException {
-        view.write("Out Developer in format NAME \n" +
-                "Salary \n" +
-                "SEX \n" +
-                "age");
-       DeveloperDAO.read();
+    public void readDeveloper()  {
+        List<Developer> list= developerDAO.read();
+        System.out.println(list.toString());
     }
 
     public Developer enterPositionDeveloper() {
@@ -49,12 +42,23 @@ public class DeveloperService {
         return (new Developer(name, salary,sex,age));
     }
     public void deleteDeveloper() {
-        view.write("Enter Developer name");
+        view.write("Enter Developer  name");
         String name = validateString(view);
-        try {
-            DeveloperDAO.delete(name);
-        } catch (SQLException e) {
-            view.write("Can't delete  developer with name -- " + name + "  " + e.getMessage());
+        Developer developer = developerDAO.findByName(name);
+        if (developer != null) {
+            developerDAO.delete(developer);
+        } else {
+            view.write("Developer with " + name + " not found");
+        }
+    }
+
+    public void updateDeveloper() {
+       Developer developer = enterPositionDeveloper();
+        developer = developerDAO.findByName(developer.getName());
+        if (developer != null) {
+            developerDAO.update(developer);
+        } else {
+            view.write("Developer with not found");
         }
     }
 }

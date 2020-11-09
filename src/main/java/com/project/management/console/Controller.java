@@ -1,10 +1,11 @@
 package com.project.management.console;
 
+import com.project.management.database.HibernateDataBaseConnector;
 import com.project.management.services.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Hibernate;
 
-import java.sql.SQLException;
 
 import static com.project.management.services.InputValidator.*;
 
@@ -19,17 +20,16 @@ public class Controller {
     }
 
     public void askMainOption() {
-        view.write("Hello world \n" +
-                "This is Project management system \n" +
-                "Please tape one of the next command \n" +
-                "For CRUD  function type (CRUD) \n" +
-                "For reports function type (report) \n" +
-                "For exit type(exit)");
-        view.write("");
+        view.write("Please tape one of the next command \n" +
+                "for create function type (create) \n" +
+                "for update function type (update) \n" +
+                "for delete function type (delete) \n" +
+                "for read function type (read) \n" +
+                "or exit for exit");
         choseOfMainFunction(view.read());
     }
 
-    public void choseOfMainFunction(String input) {
+  /*  public void choseOfMainFunction(String input) {
         switch (input) {
             case "CRUD": {
                 tableCrudAsk(view);
@@ -37,12 +37,7 @@ public class Controller {
                 askMainOption();
                 break;
             }
-            case "report": {
-                reportChoseAsk(view);
-                choseReportOption(validateString(view));
-                askMainOption();
-                break;
-            }
+
             case "exit": {
                 view.write("Goodbye!");
                 System.exit(0);
@@ -54,9 +49,9 @@ public class Controller {
                 askMainOption();
             }
         }
-    }
+    }*/
 
-    public void choseCrudOption(String input) {
+    public void choseOfMainFunction(String input) {
         switch (input) {
             case "create": {
                 InputValidator.tableChoseAsk(view);
@@ -84,88 +79,45 @@ public class Controller {
             }
             case "exit": {
                 view.write("Goodbye!!!");
+                HibernateDataBaseConnector.endWork();
+                System.exit(0);
                 break;
             }
             default: {
                 view.write("Command was incorrect \n" +
                         "try one more time to chose CRUD command");
                 InputValidator.tableCrudAsk(view);
-                choseCrudOption(view.read());
+                choseOfMainFunction(view.read());
                 break;
             }
         }
     }
 
-    public void choseReportOption(String input) {
-        switch (input) {
-            case "cost": {
-                ReportQueryService reportQueryService = new ReportQueryService(view);
-                reportQueryService.reportCostOfProject();
-                askMainOption();
-                break;
-            }
-            case "devList": {
-                ReportQueryService reportQueryService = new ReportQueryService(view);
-                reportQueryService.reportDevelopersOfProject();
-                askMainOption();
-                break;
 
-            }
-            case "byLanguage": {
-                ReportQueryService reportQueryService = new ReportQueryService(view);
-                reportQueryService.reportByLanguage();
-                askMainOption();
-                break;
-            }
-            case "byLevel": {
-                ReportQueryService reportQueryService = new ReportQueryService(view);
-                reportQueryService.reportByLevel();
-                askMainOption();
-                break;
-            }
-            case "listProj": {
-                ReportQueryService reportQueryService = new ReportQueryService(view);
-                reportQueryService.reportListProjects();
-                askMainOption();
-                break;
-            }
-            case "exit": {
-                view.write("Goodbye!!!!");
-                break;
-            }
-            default: {
-                view.write("Command was incorrect \n" +
-                        "try one more time to chose CRUD command");
-                InputValidator.tableCrudAsk(view);
-                choseCrudOption(view.read());
-                break;
-            }
-        }
-    }
 
     public void optionCreateObjectMenu(String input) {
         switch (input) {
             case "company": {
                 CompanyService companyService = new CompanyService(view);
-                companyService.inputCompany();
+                companyService.createCompany();
                 askMainOption();
                 break;
             }
             case "customer": {
                 CustomerService customerService = new CustomerService(view);
-                customerService.inputCustomer();
+                customerService.createCustomer();
                 askMainOption();
                 break;
             }
             case "developer": {
                 DeveloperService developerService = new DeveloperService(view);
-                developerService.inputDeveloper();
+                developerService.createDeveloper();
                 askMainOption();
                 break;
             }
             case "project": {
                 ProjectService projectService = new ProjectService(view);
-                projectService.inputProject();
+                projectService.createProject();
                 askMainOption();
                 break;
             }
@@ -237,7 +189,7 @@ public class Controller {
             }
             case "developer": {
                 DeveloperService developerService = new DeveloperService(view);
-                developerService.inputDeveloper();
+                developerService.updateDeveloper();
                 askMainOption();
                 break;
             }
@@ -264,46 +216,26 @@ public class Controller {
         switch (input) {
             case "customer": {
                 CustomerService customerService = new CustomerService(view);
-                try {
                     customerService.readCustomer();
-                } catch (SQLException e) {
-                    System.out.println("not good with read customer");
-                    e.printStackTrace();
-                }
                 askMainOption();
                 break;
             }
             case "company": {
                 CompanyService companyService = new CompanyService(view);
-                try {
-                    companyService.readCompany();
-                } catch (SQLException e) {
-                    System.out.println("not good with read company ");
-                    e.printStackTrace();
-                }
+               companyService.readCompany();
                 askMainOption();
                 break;
 
             }
             case "project": {
                 ProjectService projectService = new ProjectService(view);
-                try {
                     projectService.readProject();
-                } catch (SQLException e) {
-                    System.out.println("not good with read project ");
-                    e.printStackTrace();
-                }
                 askMainOption();
                 break;
             }
             case "developer": {
                 DeveloperService developerService = new DeveloperService(view);
-                try {
                     developerService.readDeveloper();
-                } catch (SQLException e) {
-                    System.out.println("not good with read company ");
-                    e.printStackTrace();
-                }
                 askMainOption();
                 break;
             }
